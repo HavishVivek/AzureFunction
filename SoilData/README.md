@@ -1,60 +1,56 @@
-# IoT Sensor Monitoring & Device Control System
+# Soil Moisture Monitoring System
 
 ## What This Is
 
-This is a comprehensive IoT monitoring and automation platform built on Azure IoT Hub and Azure Functions. The system monitors multiple types of sensors and intelligently controls connected devices based on real-time sensor data and custom business logic.
+An automated soil moisture monitoring and irrigation control system built on Azure IoT Hub and Azure Functions. The system monitors soil moisture levels from IoT devices and automatically controls irrigation relays based on real-time sensor readings.
 
 ## What It Does
 
-This platform provides automated monitoring and control across various sensor types and device outputs:
+This system provides automated irrigation management:
 
-- **Receives Sensor Data**: Collects real-time readings from multiple sensors across connected IoT devices via Azure IoT Hub
-- **Processes Multiple Data Streams**: Each Azure Function is dedicated to a specific sensor type or monitoring task
-- **Analyzes Conditions**: Evaluates sensor readings against configured thresholds and business rules
-- **Controls Device Outputs**: Automatically sends commands to devices to trigger appropriate outputs and actions
-- **Monitors Performance**: Logs all sensor data, decisions, and actions for tracking and analysis
+- **Receives Soil Moisture Data**: Collects real-time moisture readings from soil sensors connected to IoT devices via Azure IoT Hub
+- **Analyzes Moisture Levels**: Evaluates sensor readings against a configured threshold to determine irrigation needs
+- **Controls Irrigation**: Automatically sends relay commands to devices to turn irrigation on or off based on soil conditions
+- **Logs Activity**: Records all sensor data, decisions, and relay commands for monitoring and analysis
 
 ## What's In This Repository
 
-- **Multiple Azure Functions**: Each function monitors a specific sensor type or handles a particular automation task
-  - **soil-moisture-trigger/**: Monitors soil moisture levels and controls irrigation relays
-  - Additional functions can be added for temperature, humidity, light, pressure, motion, and other sensors
-- **azurite/**: Local Azure Storage emulator data for development and testing
+### soil-moisture-trigger/
+An Azure Function that monitors soil moisture and controls irrigation relays. Contains:
+- **function_app.py** - Main function that processes Event Hub messages from IoT Hub, reads soil moisture values, evaluates threshold conditions (450), and sends direct method commands to turn relays on or off
+- **requirements.txt** - Python dependencies including azure-functions and azure-iot-hub libraries
+- **host.json** - Azure Functions runtime configuration with logging and extension bundle settings
+- **local.settings.json** - Local development settings for connection strings and environment variables
+- **.vscode/extensions.json** - Recommended VS Code extensions for Azure Functions development
+- **.gitignore** - Files to exclude from version control
 
-## Sensor Types & Use Cases
-
-This system is designed to handle various monitoring and automation scenarios:
-
-### Environmental Monitoring
-- **Soil Moisture**: Automatic irrigation control based on moisture levels
-- **Temperature & Humidity**: Climate control for greenhouses or indoor environments
-- **Light Levels**: Automated lighting systems based on ambient conditions
-- **Air Quality**: Ventilation control based on CO2 or particulate levels
-
-### Industrial & Agricultural Applications
-- **Pressure Sensors**: Monitor and control water systems or pneumatic equipment
-- **Flow Sensors**: Track liquid or gas flow and trigger alerts or adjustments
-- **Motion Sensors**: Security monitoring and automated access control
-- **Level Sensors**: Tank or reservoir monitoring with automatic refill triggers
-
-### Custom Automation
-- Each Azure Function can implement unique logic for its specific sensor type
-- Devices receive commands and execute outputs like activating relays, motors, valves, alarms, or displays
-- Multi-sensor coordination for complex automation workflows
-
-## What It's Used For
-
-This solution is ideal for scenarios requiring:
-
-- Real-time monitoring of environmental or industrial conditions
-- Automated responses to changing sensor readings
-- Remote control and management of distributed IoT devices
-- Scalable monitoring across multiple locations or zones
-- Data-driven decision making for resource optimization
-- Reduced manual intervention in monitoring and control tasks
-
-The platform helps improve efficiency, reduce waste, automate repetitive tasks, and maintain optimal conditions across various applications including agriculture, smart buildings, industrial automation, and environmental monitoring.
+### azurite/
+Local Azure Storage emulator data for development and testing. Contains:
+- Database files for blob, queue, and table storage emulation
+- Configuration files for the Azurite emulator
+- Local storage data used during function testing
 
 ## How It Works
 
-IoT devices equipped with various sensors continuously send telemetry data to Azure IoT Hub. Multiple Azure Functions subscribe to these data streams, with each function specialized for specific sensor types. When sensor data arrives, the appropriate function processes the information, applies business logic and thresholds, then sends direct method commands back to the devices to control outputs such as relays, motors, actuators, or other connected hardware. This creates a fully automated, event-driven monitoring and control system that operates in real-time.
+IoT devices equipped with soil moisture sensors continuously send telemetry data to Azure IoT Hub. The Azure Function subscribes to the Event Hub-compatible endpoint and receives these messages in real-time. When a message arrives, the function:
+
+1. Decodes and parses the incoming JSON message
+2. Extracts the device ID from IoT Hub metadata
+3. Reads the soil moisture value from the message payload
+4. Compares the moisture level against a threshold (450)
+5. Determines whether irrigation is needed (moisture > 450 triggers relay on, otherwise relay off)
+6. Sends a direct method command back to the IoT device to control the relay
+7. Logs the decision and action taken
+
+This creates an event-driven, automated irrigation system that responds to changing soil conditions in real-time without manual intervention.
+
+## Use Case
+
+This solution is designed for automated irrigation management in:
+- Home gardens and landscaping
+- Small-scale agriculture or greenhouses
+- Plant monitoring systems
+- Water conservation applications
+- Smart farming projects
+
+The system helps optimize water usage, prevent over or under-watering, and automate irrigation tasks based on actual soil conditions rather than fixed schedules.
